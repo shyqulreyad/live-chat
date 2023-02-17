@@ -8,6 +8,8 @@
                 <span class="name"> {{doc.name}} </span>
                 <span class="message"> {{doc.message}} </span>
                 <span class="createdAt"> {{doc.createdAt}} </span>
+                <button @click="deleteMessage(doc.id)">Delete</button>                
+
             </div>
         </div>
         <div v-else>
@@ -21,6 +23,8 @@ import getCollection from '@/composable/getCollection';
 import { computed, onUpdated, ref } from '@vue/runtime-core';
 import {formatDistanceToNow} from 'date-fns'
 import Spinner from './Spinner.vue'
+import { projectFirestore } from "@/firebase/config"
+
 
 export default {
     setup() {
@@ -34,11 +38,15 @@ export default {
             }
         });
 
+        const deleteMessage = async (id) => {
+            projectFirestore.collection('messages').doc(id).delete();
+        }
+
         const messages = ref(null)
         onUpdated(()=>{
             messages.value.scrollTop = messages.value.scrollHeight
         })
-        return { error, document, formatedDocument, messages };
+        return { error, document, formatedDocument, messages, deleteMessage };
     },
     components: { Spinner }
 }
